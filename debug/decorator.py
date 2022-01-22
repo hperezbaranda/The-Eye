@@ -3,7 +3,7 @@ from asyncio.log import logger
 from http.client import BAD_REQUEST
 import logging
 
-from redis import ResponseError
+from rest_framework import status
 from .models import Log
 from django.utils import timezone
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -29,7 +29,7 @@ def log_any_event(view_name,message):
                 #If a response is generated without any Exception
                 #coming up, logged the event and return it
 
-                if response.status_code != 201:
+                if not status.is_success(response.status_code):
                     debug_entry = Log(
                         timestamp=timezone.now(),
                         view=view_name,
