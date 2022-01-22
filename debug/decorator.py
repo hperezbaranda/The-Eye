@@ -1,9 +1,12 @@
 from ast import arg
 from asyncio.log import logger
+from http.client import BAD_REQUEST
 import logging
+
+from redis import ResponseError
 from .models import Log
 from django.utils import timezone
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from eye.log import getLog
 
 logger = getLog('views.py')
@@ -26,16 +29,29 @@ def log_any_event(view_name,message):
                 #If a response is generated without any Exception
                 #coming up, logged the event and return it
 
-                debug_entry = Log(
-                    timestamp=timezone.now(),
-                    view=view_name,
-                    exceptionclass='',
-                    level=logging.getLevelName(logging.INFO),
-                    message=': '.join(map(str,[message, response.data]))
-                    )
-                debug_entry.save()
+                if response.status_code != 201:
+                    debug_entry = Log(
+                        timestamp=timezone.now(),
+                        view=view_name,
+                        exceptionclass=str(HttpResponseBadRequest.__name__),
+                        level=logging.getLevelName(logging.ERROR),
+                        message=response.data)
+                    debug_entry.save()
+                else:
+                        
+                    debug_entry = Log(
+                        timestamp=timezone.now(),
+                        view=view_name,
+                        exceptionclass='',
+                        level=logging.getLevelName(logging.INFO),
+                        message=': '.join(map(str,[message, response.data]))
+                        )
+                    debug_entry.save()
+
                 logger.info(debug_entry.message)
+        
                 return response
+
             except Exception as e:
                 #If an unexpected Exception occurs, make a debug entry
                 #and save it
