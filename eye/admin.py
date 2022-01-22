@@ -1,11 +1,9 @@
-from re import M
 from django.contrib import admin
-from .models import Event, DataEvent
+from .models import Event
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ("session", "category", "name", "timestamp",)
+    list_display = ("session", "category", "name", "timestamp", "data")
 
 
 admin.site.register(Event, EventAdmin)
-admin.site.register(DataEvent)
