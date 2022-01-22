@@ -4,7 +4,7 @@ from .models import Event, DataEvent
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ("session", "category", "name", "timestamp")
+    list_display = ("session", "category", "name", "timestamp",)
 
 
 admin.site.register(Event, EventAdmin)
