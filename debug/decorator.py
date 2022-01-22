@@ -1,8 +1,12 @@
 from ast import arg
+from asyncio.log import logger
 import logging
 from .models import Log
 from django.utils import timezone
 from django.http import HttpResponse
+from eye.log import getLog
+
+logger = getLog('views.py')
 
 def log_any_event(view_name,message):
     """
@@ -30,6 +34,7 @@ def log_any_event(view_name,message):
                     message=': '.join(map(str,[message, response.data]))
                     )
                 debug_entry.save()
+                logger.info(debug_entry.message)
                 return response
             except Exception as e:
                 #If an unexpected Exception occurs, make a debug entry
@@ -41,6 +46,7 @@ def log_any_event(view_name,message):
                     level=logging.getLevelName(logging.ERROR),
                     message=str(e))
                 debug_entry.save()
+                logger.error(debug_entry.message)
                 #Return the Server Error(500) status code
                 return HttpResponse(status=500)
  

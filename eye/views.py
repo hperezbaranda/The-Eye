@@ -34,7 +34,6 @@ class EventView(viewsets.ViewSet):
         category = request.data["category"]
         name = request.data["name"]
 
-        logger.info(f'Created an event "{category.upper()} {name.upper()}"')
         return Response(request.data, 201)
 
     @log_any_event('Destroy Event','Removing event')
