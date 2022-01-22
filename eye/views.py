@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+
+from debug.decorator import log_any_event
 from .serializers import EventSerializer
 from .models import Event
 from rest_framework.response import Response
@@ -25,6 +27,7 @@ class EventView(viewsets.ViewSet):
         serializer = EventSerializer(event)
         return Response(serializer.data)
 
+    @log_any_event('Event')
     def create(self, request):
 
         transaction.on_commit(lambda: create_event.delay(request.data))
