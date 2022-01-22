@@ -5,7 +5,7 @@ from debug.decorator import log_any_event
 from .serializers import EventSerializer
 from .models import Event
 from rest_framework.response import Response
-from .tasks import create_event
+from .tasks import create_event, remove_event
 from django.db import transaction
 from .log import getLog
 
@@ -27,7 +27,7 @@ class EventView(viewsets.ViewSet):
         serializer = EventSerializer(event)
         return Response(serializer.data)
 
-    @log_any_event('Event')
+    @log_any_event('Create Event','Creating event')
     def create(self, request):
 
         transaction.on_commit(lambda: create_event.delay(request.data))
@@ -36,3 +36,10 @@ class EventView(viewsets.ViewSet):
 
         logger.info(f'Created an event "{category.upper()} {name.upper()}"')
         return Response(request.data, 201)
+
+    @log_any_event('Destroy Event','Removing event')
+    def destroy(self, request, pk=None):
+        event = get_object_or_404(Event, pk=pk)
+        transaction.on_commit(lambda: remove_event.delay(event.id))
+        serializer = EventSerializer(event)
+        return Response(serializer.data)

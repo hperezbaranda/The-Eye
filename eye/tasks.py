@@ -11,3 +11,8 @@ def create_event(data):
     queryset.save()
     serializer = EventSerializer(queryset)
     return serializer.data
+
+@app.task
+def remove_event(id):
+    query = Event.objects.get(pk = id)
+    query.delete()
