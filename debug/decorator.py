@@ -11,7 +11,7 @@ from eye.log import getLog
 
 logger = getLog('views.py')
 
-def log_any_event(view_name,message):
+def log_any_event(view_name):
     """
     Logs all the events occuring in a Django view, to the
     Log model.
@@ -44,7 +44,7 @@ def log_any_event(view_name,message):
                         view=view_name,
                         exceptionclass='',
                         level=logging.getLevelName(logging.INFO),
-                        message=': '.join(map(str,[message, response.data]))
+                        message=': '.join(map(str,[response.data]))
                         )
                     debug_entry.save()
 
