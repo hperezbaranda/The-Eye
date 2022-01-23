@@ -7,11 +7,10 @@ from .celery import app
 
 @app.task
 def create_event(data):
-    serializer = EventSerializer(data=data)
-    if serializer.is_valid():
-        serializer.save()
-       
-    return serializer.data
+    queryset = Event.objects.create(**data)
+    queryset.save()
+    
+    return data
 
 @app.task
 def remove_event(id):
