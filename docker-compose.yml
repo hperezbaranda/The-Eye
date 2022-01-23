@@ -1,0 +1,51 @@
+version: "3.7"
+
+x-common-variables: &common-variables
+  DJANGO_SETTINGS_MODULE: "backend.settings"
+  CELERY_BROKER_URL: "redis://redis:6379/0"
+  CELERY_RESULT_BACKEND: "redis://redis:6379"
+  CELERY_TIMEZONE : "UTC"
+  DEBUG: "True"
+  ALLOWED_HOSTS: "*,test"
+
+services:
+  app:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    environment:
+      <<: *common-variables
+    ports:
+      - 8080:8080
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8080"      
+    depends_on:
+      - redis
+    networks:
+      - theEye
+
+  celery-worker:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    environment:
+      <<: *common-variables
+    command: celery -A eye worker -l info
+    depends_on:
+      - redis
+    networks:
+      - theEye
+
+  redis:
+    image: redis:6.0.8-alpine
+    ports:
+      - 6379:6379
+    networks:
+      - theEye
+
+networks:
+  theEye:
+    external: true
