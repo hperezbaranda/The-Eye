@@ -12,7 +12,7 @@ class EventSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Event
-        fields = ('id','session_id', 'category', 'name', 'timestamp', 'data')
+        fields = ('session_id', 'category', 'name', 'timestamp', 'data')
 
     def validate_timestamp(self, value):
         """
